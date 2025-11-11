@@ -1,127 +1,134 @@
+// ¡SCRIPT MUY ACTUALIZADO!
+// ¡Ahora puede curar al jugador al morir!
 using UnityEngine;
-using System.Collections; // Para la corrutina de parpadeo
+using UnityEngine.UI; 
+using System.Collections;
 
-/// <summary>
-/// Gestiona la salud de un enemigo.
-/// Debe ir en el prefab o el objeto del Enemigo.
-/// </summary>
 public class EnemyHealth : MonoBehaviour
 {
-    [Header("Salud")]
-    public int maxHealth = 3;   // Salud máxima
-    private int currentHealth;  // Salud actual
+    [Header("Configuración de Vida")]
+    public int maxHealth = 3; 
+    public int currentHealth;
 
-    [Header("Animación de Muerte")]
-    [Tooltip("El tiempo que dura la animación de 'morir' antes de destruir el objeto")]
-    public float deathAnimationTime = 1.0f;
-    
-    private Animator animator;  // El componente Animator
-    private SpriteRenderer spriteRenderer; // Para el parpadeo
-    public bool isDead = false; // Para evitar que muera varias veces
+    [Header("Referencias de UI (Barra de Vida)")]
+    public Image healthBarFill; 
 
-    // Start se llama antes del primer frame
+    [Header("Configuración de Animación (Opcional)")]
+    public bool useTakeHitAnimation = true;
+    public bool useDeathAnimation = true;
+    public float destroyDelay = 2f; 
+
+    // --- ¡NUEVAS VARIABLES DE CURACIÓN! ---
+    [Header("Recompensas (Opcional)")]
+    [Tooltip("Marcar si este enemigo debe curar al jugador al morir")]
+    public bool healPlayerOnDeath = false;
+    [Tooltip("Cuántos puntos de vida (corazones) restaura")]
+    public int healthToRestore = 1;
+
+    // --- Componentes Internos ---
+    private Animator animator;
+    private Collider2D col; 
+    private SpriteRenderer spriteRenderer; 
+    public bool isDead = false;
+    private GameObject healthCanvas; 
+
     void Start()
     {
-        // Al empezar, el enemigo tiene la salud máxima
         currentHealth = maxHealth;
-
-        // Obtenemos los componentes que usaremos
+        col = GetComponent<Collider2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>(); 
         animator = GetComponent<Animator>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
-    }
-
-    /// <summary>
-    /// Función pública que otros scripts (como PlayerAttack) pueden llamar.
-    /// </summary>
-    /// <param name="damage">La cantidad de daño recibido</param>
-    public void TakeDamage(int damage)
-    {
-        // Si ya estamos muertos, no hacemos nada más
-        if (isDead)
+        if (animator == null)
         {
-            return; 
+            useTakeHitAnimation = false;
+            useDeathAnimation = false;
         }
 
-        // 1. Restamos el daño a la salud actual
-        currentHealth -= damage;
-
-        Debug.Log($"Enemigo '{gameObject.name}' recibe {damage} de daño. Salud restante: {currentHealth}");
-
-        // 2. Comprobar si el enemigo ha muerto
-        if (currentHealth <= 0)
+        if (healthBarFill != null)
         {
-            Die();
+            healthCanvas = healthBarFill.GetComponentInParent<Canvas>()?.gameObject;
+            healthBarFill.fillAmount = 1; 
+            if(healthCanvas != null)
+                healthCanvas.SetActive(false);
+        }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        if (isDead) return;
+
+        currentHealth -= damage;
+        
+        if (healthBarFill != null)
+        {
+            if(healthCanvas != null)
+                healthCanvas.SetActive(true);
+            float fillAmount = (float)currentHealth / (float)maxHealth;
+            healthBarFill.fillAmount = fillAmount;
+        }
+
+        if (currentHealth > 0)
+        {
+            if (useTakeHitAnimation && animator != null)
+            {
+                animator.SetTrigger("TakeHit");
+            }
+            else
+            {
+                StartCoroutine(BlinkEffect());
+            }
         }
         else
         {
-            // 3. Si no ha muerto, activar la animación de "recibir golpe"
-            if (animator != null)
-            {
-                // 'TakeHit' debe ser el nombre del Trigger que crees en el Animator
-                animator.SetTrigger("TakeHit");
-            }
-
-            // ...y el efecto de "parpadeo"
-            StartCoroutine(FlashEffect());
+            Die();
         }
     }
 
-    /// <summary>
-    /// Se llama cuando la salud del enemigo llega a 0.
-    /// </summary>
     void Die()
     {
-        isDead = true; // Marcamos que estamos muertos
+        if (isDead) return;
 
-        Debug.Log($"Enemigo '{gameObject.name}' ha muerto.");
+        isDead = true;
+        Debug.Log("Enemigo ha muerto.");
 
-        // 1. Activar animación de muerte (si existe un Animator)
-        if (animator != null)
+        if (healthCanvas != null)
+            healthCanvas.SetActive(false);
+        if (GetComponent<EnemyAI>() != null)
+            GetComponent<EnemyAI>().enabled = false;
+        col.enabled = false;
+        this.enabled = false; 
+
+        // --- ¡NUEVA LÓGICA DE CURACIÓN! ---
+        if (healPlayerOnDeath)
         {
-            // 'death' debe ser el nombre del Trigger que crees en el Animator
+            // Busca al jugador (usando el Singleton) y lo cura
+            if (PlayerHealth.Instance != null)
+            {
+                PlayerHealth.Instance.Heal(healthToRestore);
+            }
+        }
+        // --- Fin de la lógica de curación ---
+
+        if (useDeathAnimation && animator != null)
+        {
             animator.SetTrigger("death"); 
+            Destroy(gameObject, destroyDelay); 
         }
-
-        // 2. Desactivar colisiones para que no nos sigan golpeando
-        if (GetComponent<Collider2D>() != null)
+        else
         {
-            GetComponent<Collider2D>().enabled = false;
+            Destroy(gameObject); 
         }
-        
-        // 3. Desactivar físicas (si las tuviera)
-        if (GetComponent<Rigidbody2D>() != null)
-        {
-            GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
-        }
-
-        // 4. Opcional: Desactivar el script de IA para que deje de moverse
-        // (Si tienes un script llamado 'EnemyAI', por ejemplo)
-        // EnemyAI aiScript = GetComponent<EnemyAI>();
-        // if (aiScript != null)
-        // {
-        //     aiScript.enabled = false;
-        // }
-
-        // 5. Destruir el objeto DESPUÉS de que la animación haya terminado
-        Destroy(gameObject, deathAnimationTime);
     }
 
-    /// <summary>
-    /// Corrutina para el parpadeo al recibir daño
-    /// </summary>
-    private IEnumerator FlashEffect()
+    IEnumerator BlinkEffect()
     {
-        if (spriteRenderer != null)
-        {
-            // Cambia a un color rojo semitransparente o el que prefieras
-            spriteRenderer.color = new Color(1f, 0.5f, 0.5f, 1f); 
-            
-            // Espera un momento
-            yield return new WaitForSeconds(0.1f); 
-            
-            // Vuelve al color original (blanco)
-            spriteRenderer.color = Color.white; 
-        }
+        if (spriteRenderer == null) yield break; 
+        spriteRenderer.color = Color.red;
+        yield return new WaitForSeconds(0.1f);
+        spriteRenderer.color = Color.white;
+        yield return new WaitForSeconds(0.1f);
+        spriteRenderer.color = Color.red;
+        yield return new WaitForSeconds(0.1f);
+        spriteRenderer.color = Color.white;
     }
 }
-

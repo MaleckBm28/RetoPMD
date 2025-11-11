@@ -37,6 +37,12 @@ public class MainMenuManager : MonoBehaviour
         SceneManager.LoadScene("Instrucciones");
     }
 
+        public void MostrarCreditos()
+    {
+        Debug.Log("El bot�n 'Creditos' ha sido pulsado.");
+        SceneManager.LoadScene("Creditos");
+    }
+
     public void SalirJuego()
     {
         Debug.Log("Saliendo del juego...");

@@ -1,43 +1,58 @@
-// ¡SCRIPT MUY ACTUALIZADO!
-// Hemos cambiado la vida de '100' a un sistema de 'corazones'.
+// ¡SCRIPT ACTUALIZADO!
+// Le hemos añadido un 'Singleton' (Instance)
+// para que el Enemigo pueda encontrarlo y curarlo.
 using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
-using System; // Necesario para 'Action'
+using System; 
 
 public class PlayerHealth : MonoBehaviour
 {
-    [Header("Configuración de Vida (Corazones)")]
-    public int numberOfHearts = 3; // ¿Cuántos corazones MÁXIMOS tienes?
-    private int maxHealth;         // Vida máxima (numberOfHearts * 2)
-    public int currentHealth;      // Vida actual
+    // --- ¡NUEVO SINGLETON! ---
+    public static PlayerHealth Instance { get; private set; }
+    // --- Fin del Singleton ---
 
+    [Header("Configuración de Vida (Corazones)")]
+    public int numberOfHearts = 3; 
+    private int maxHealth;         
+    public int currentHealth;      
     public bool isDead = false;
 
-    // --- Evento de Salud ---
-    // Esto "gritará" a la UI cada vez que la vida cambie.
-    public static event Action<int, int> OnHealthChanged; // <current, max>
-
-    // --- Referencias de Componentes ---
+    public static event Action<int, int> OnHealthChanged; 
     private SpriteRenderer spriteRenderer;
     private Animator animator;
+
+    // --- ¡NUEVA FUNCIÓN Awake! ---
+    void Awake()
+    {
+        // Configuración del Singleton
+        if (Instance == null)
+        {
+            Instance = this;
+            // Opcional: DontDestroyOnLoad(gameObject); 
+            // (No lo pongas si no quieres que el jugador pase entre escenas)
+        }
+        else
+        {
+            Destroy(gameObject); // Si ya existe un jugador, destruye este
+        }
+    }
+    // --- Fin de Awake ---
 
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
-
-        // 1 corazón = 2 puntos de vida (media y entera)
-        maxHealth = numberOfHearts * 2;
+        
+        // 1 corazón = 1 punto de vida
+        maxHealth = numberOfHearts; // Sistema 1:1
         currentHealth = maxHealth;
 
-        // Avisa a la UI de que ponga la vida al máximo al empezar
         StartCoroutine(InitialHealthUpdate());
     }
 
     IEnumerator InitialHealthUpdate()
     {
-        // Esperamos un fotograma para asegurarnos de que la UI se ha suscrito
         yield return null;
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
@@ -49,15 +64,10 @@ public class PlayerHealth : MonoBehaviour
         currentHealth -= damage;
         if (currentHealth < 0) currentHealth = 0;
 
-        Debug.Log($"El jugador recibe {damage} de daño. Vida restante: {currentHealth}/{maxHealth}");
-
-        // ¡Avisa a la UI de que la vida ha cambiado!
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
 
-        // --- Lógica de Animación y Parpadeo ---
         if (animator != null)
         {
-            // Llama al trigger "TakeHit" en el Animator del jugador
             animator.SetTrigger("Hurt");
         }
         StartCoroutine(BlinkEffect());
@@ -68,7 +78,6 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
-    // (Opcional) Función para curar
     public void Heal(int amount)
     {
         currentHealth += amount;
@@ -76,28 +85,21 @@ public class PlayerHealth : MonoBehaviour
         {
             currentHealth = maxHealth;
         }
+        Debug.Log($"¡Jugador curado! Vida actual: {currentHealth}");
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 
     void Die()
     {
         isDead = true;
-        Debug.Log("¡El jugador ha muerto!");
-
-        // (Opcional) Animación de muerte
-        // if (animator != null) { animator.SetTrigger("Die"); }
-        
-        // --- Cargar Escena de Derrota (Método Simple) ---
         Time.timeScale = 0f; 
         SceneManager.LoadScene("Derrota");
-
         GetComponent<Collider2D>().enabled = false;
         this.enabled = false;
     }
 
     IEnumerator BlinkEffect()
     {
-        // Parpadeo rojo
         spriteRenderer.color = Color.red;
         yield return new WaitForSeconds(0.1f);
         spriteRenderer.color = Color.white;
