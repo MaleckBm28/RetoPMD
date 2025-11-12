@@ -1,10 +1,12 @@
-﻿
+﻿// ¡SCRIPT ACTUALIZADO!
+// ¡Le hemos quitado la lógica de ataque!
+// Ahora el script PlayerAttack.cs se encarga de TODO (daño Y animación).
 using UnityEngine;
 using System.Collections;
 
-public class PlayerMovement : MonoBehaviour { // ¡Clase renombrada de "Bandit" a "PlayerMovement"!
+public class PlayerMovement : MonoBehaviour { 
 
-    [SerializeField] float      m_speed = 4.0f; // ¡Esta es la variable que vamos a cambiar!
+    [SerializeField] float      m_speed = 4.0f; 
     [SerializeField] float      m_jumpForce = 7.5f;
 
     private Animator            m_animator;
@@ -12,7 +14,6 @@ public class PlayerMovement : MonoBehaviour { // ¡Clase renombrada de "Bandit" 
     private Sensor_Bandit       m_groundSensor;
     private bool                m_grounded = false;
     private bool                m_combatIdle = false;
-    private bool                m_isDead = false;
 
     // Use this for initialization
     void Start () {
@@ -51,27 +52,10 @@ public class PlayerMovement : MonoBehaviour { // ¡Clase renombrada de "Bandit" 
         m_animator.SetFloat("AirSpeed", m_body2d.linearVelocity.y);
 
         // -- Handle Animations --
-        //Death
-        if (Input.GetKeyDown("e")) {
-            if(!m_isDead)
-                m_animator.SetTrigger("Death");
-            else
-                m_animator.SetTrigger("Recover");
 
-            m_isDead = !m_isDead;
-        }
-            
-        //Hurt
-        else if (Input.GetKeyDown("q"))
-            m_animator.SetTrigger("Hurt");
-
-        //Attack
-        else if(Input.GetMouseButtonDown(0)) {
-            m_animator.SetTrigger("Attack");
-        }
-
+       
         //Change between idle and combat idle
-        else if (Input.GetKeyDown("f"))
+        if (Input.GetKeyDown("f")) // Cambiado de 'else if' a 'if'
             m_combatIdle = !m_combatIdle;
 
         //Jump
@@ -97,17 +81,9 @@ public class PlayerMovement : MonoBehaviour { // ¡Clase renombrada de "Bandit" 
     }
 
     // --- ¡¡NUEVA FUNCIÓN AÑADIDA!! ---
-    /// <summary>
-    /// Llamado por PlayerHealth para aumentar la velocidad de movimiento.
-    /// Modifica tu variable "m_speed".
-    /// </summary>
-    /// <param name="amount">La cantidad a añadir a la velocidad actual.</param>
     public void IncreaseSpeed(float amount)
     {
         m_speed += amount;
         Debug.Log($"¡VELOCIDAD AUMENTADA! Nueva velocidad: {m_speed}");
-        
-        // (Opcional) Si usas un Animator, puedes actualizarlo aquí
-        // m_animator.SetFloat("moveSpeedMultiplier", m_speed / 4.0f); // (4.0f = tu velocidad base)
     }
 }

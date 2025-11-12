@@ -1,3 +1,6 @@
+// ¡SCRIPT ACTUALIZADO!
+// Ahora este script es el "JEFE" del ataque.
+// Controla el input, el cooldown, la animación Y el daño.
 using UnityEngine;
 using System.Collections; // Necesario para las Corrutinas
 
@@ -8,20 +11,32 @@ using System.Collections; // Necesario para las Corrutinas
 public class PlayerAttack : MonoBehaviour
 {
     [Header("Configuración de Ataque")]
-    public Transform attackPoint;    // El objeto vacío que marca dónde se origina el golpe
-    public float attackRange = 0.5f;   // El radio del círculo de detección del golpe
-    public int attackDamage = 1;       // Cuánto daño hace cada golpe
+    public Transform attackPoint;    
+    public float attackRange = 0.5f;   
+    public int attackDamage = 1;       
 
     [Header("Tiempos de Ataque")]
     [Tooltip("El tiempo total de la animación de ataque (para evitar spam)")]
-    public float attackCooldown = 1.0f; // Asumimos que tu anim "lenta" dura 1 seg. ¡Ajústalo!
+    public float attackCooldown = 1.0f; 
     [Tooltip("El momento exacto en que el golpe hace daño (ej. 0.5s)")]
-    public float attackHitDelay = 0.5f; // El delay que pediste
+    public float attackHitDelay = 0.5f; 
 
     [Header("Detección")]
-    public LayerMask enemyLayer;     // La capa en la que se encuentran los enemigos (IMPORTANTE)
+    public LayerMask enemyLayer;     
 
-    private bool isAttacking = false; // Flag para evitar spamear el ataque
+    // --- ¡NUEVAS REFERENCIAS! ---
+    private Animator animator; // Referencia al Animator
+    private bool isAttacking = false; 
+
+    void Start()
+    {
+        // ¡NUEVO! Obtenemos el Animator
+        animator = GetComponent<Animator>();
+        if (animator == null)
+        {
+            Debug.LogError("PlayerAttack no pudo encontrar el componente Animator.");
+        }
+    }
 
     // Update se llama una vez por frame
     void Update()
@@ -41,9 +56,12 @@ public class PlayerAttack : MonoBehaviour
     {
         isAttacking = true; // Marcamos que estamos atacando
 
-        // 1. Opcional: Activar la animación de ataque
-        // animator.SetTrigger("Attack");
-
+        // 1. ¡NUEVO! Activar la animación de ataque
+        if (animator != null)
+        {
+            animator.SetTrigger("Attack"); // ¡Este es el trigger de tu script Bandit/PlayerMovement!
+        }
+        
         // 2. Esperar el delay antes de que el golpe conecte
         yield return new WaitForSeconds(attackHitDelay);
 
@@ -67,6 +85,7 @@ public class PlayerAttack : MonoBehaviour
         }
 
         // 4. Esperar a que la animación termine (el tiempo restante del cooldown)
+        // ¡Asegúrate de que 'attackCooldown' sea IGUAL o MAYOR que el 'attackHitDelay'!
         float remainingTime = attackCooldown - attackHitDelay;
         if (remainingTime > 0)
         {
@@ -90,4 +109,3 @@ public class PlayerAttack : MonoBehaviour
         Gizmos.DrawWireSphere(attackPoint.position, attackRange);
     }
 }
-
