@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿
+using UnityEngine;
 using System.Collections;
 
-public class Bandit : MonoBehaviour {
+public class PlayerMovement : MonoBehaviour { // ¡Clase renombrada de "Bandit" a "PlayerMovement"!
 
-    [SerializeField] float      m_speed = 4.0f;
+    [SerializeField] float      m_speed = 4.0f; // ¡Esta es la variable que vamos a cambiar!
     [SerializeField] float      m_jumpForce = 7.5f;
 
     private Animator            m_animator;
@@ -19,9 +20,9 @@ public class Bandit : MonoBehaviour {
         m_body2d = GetComponent<Rigidbody2D>();
         m_groundSensor = transform.Find("GroundSensor").GetComponent<Sensor_Bandit>();
     }
-	
-	// Update is called once per frame
-	void Update () {
+    
+    // Update is called once per frame
+    void Update () {
         //Check if character just landed on the ground
         if (!m_grounded && m_groundSensor.State()) {
             m_grounded = true;
@@ -93,5 +94,20 @@ public class Bandit : MonoBehaviour {
         //Idle
         else
             m_animator.SetInteger("AnimState", 0);
+    }
+
+    // --- ¡¡NUEVA FUNCIÓN AÑADIDA!! ---
+    /// <summary>
+    /// Llamado por PlayerHealth para aumentar la velocidad de movimiento.
+    /// Modifica tu variable "m_speed".
+    /// </summary>
+    /// <param name="amount">La cantidad a añadir a la velocidad actual.</param>
+    public void IncreaseSpeed(float amount)
+    {
+        m_speed += amount;
+        Debug.Log($"¡VELOCIDAD AUMENTADA! Nueva velocidad: {m_speed}");
+        
+        // (Opcional) Si usas un Animator, puedes actualizarlo aquí
+        // m_animator.SetFloat("moveSpeedMultiplier", m_speed / 4.0f); // (4.0f = tu velocidad base)
     }
 }

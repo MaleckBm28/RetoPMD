@@ -1,5 +1,5 @@
-// ¡SCRIPT MUY ACTUALIZADO!
-// ¡Ahora puede curar al jugador al morir!
+// ¡SCRIPT ACTUALIZADO!
+// Le hemos añadido la lógica de "Aumentar Velocidad" en Die().
 using UnityEngine;
 using UnityEngine.UI; 
 using System.Collections;
@@ -18,12 +18,18 @@ public class EnemyHealth : MonoBehaviour
     public bool useDeathAnimation = true;
     public float destroyDelay = 2f; 
 
-    // --- ¡NUEVAS VARIABLES DE CURACIÓN! ---
+    // --- ¡NUEVAS VARIABLES AQUÍ! ---
     [Header("Recompensas (Opcional)")]
-    [Tooltip("Marcar si este enemigo debe curar al jugador al morir")]
+    [Tooltip("¿Este enemigo cura al jugador al morir?")]
     public bool healPlayerOnDeath = false;
-    [Tooltip("Cuántos puntos de vida (corazones) restaura")]
+    [Tooltip("Cuánta vida (corazones) restaura (si usa el sistema simple)")]
     public int healthToRestore = 1;
+
+    [Tooltip("¿Este enemigo aumenta la velocidad del jugador al morir?")]
+    public bool increasePlayerSpeedOnDeath = false; // ¡NUEVO!
+    [Tooltip("Cuánto aumenta la velocidad (ej. 0.1f)")]
+    public float speedToRestore = 0.1f;         // ¡NUEVO!
+    // --- Fin de las Nuevas Variables ---
 
     // --- Componentes Internos ---
     private Animator animator;
@@ -56,7 +62,6 @@ public class EnemyHealth : MonoBehaviour
     public void TakeDamage(int damage)
     {
         if (isDead) return;
-
         currentHealth -= damage;
         
         if (healthBarFill != null)
@@ -87,27 +92,30 @@ public class EnemyHealth : MonoBehaviour
     void Die()
     {
         if (isDead) return;
-
         isDead = true;
         Debug.Log("Enemigo ha muerto.");
 
+        // --- ¡LÓGICA DE RECOMPENSAS ACTUALIZADA! ---
+        // Comprobar si debemos curar al jugador
+        if (healPlayerOnDeath)
+        {
+            PlayerHealth.Instance?.Heal(healthToRestore);
+        }
+        // ¡NUEVO! Comprobar si debemos aumentar la velocidad
+        if (increasePlayerSpeedOnDeath)
+        {
+            PlayerHealth.Instance?.ApplySpeedBoost(speedToRestore);
+        }
+        // --- Fin de la Lógica de Recompensas ---
+
+
+        // Desactivar componentes
         if (healthCanvas != null)
             healthCanvas.SetActive(false);
         if (GetComponent<EnemyAI>() != null)
             GetComponent<EnemyAI>().enabled = false;
         col.enabled = false;
         this.enabled = false; 
-
-        // --- ¡NUEVA LÓGICA DE CURACIÓN! ---
-        if (healPlayerOnDeath)
-        {
-            // Busca al jugador (usando el Singleton) y lo cura
-            if (PlayerHealth.Instance != null)
-            {
-                PlayerHealth.Instance.Heal(healthToRestore);
-            }
-        }
-        // --- Fin de la lógica de curación ---
 
         if (useDeathAnimation && animator != null)
         {

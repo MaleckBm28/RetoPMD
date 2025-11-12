@@ -1,51 +1,48 @@
-// ¡SCRIPT ACTUALIZADO!
-// Le hemos añadido un 'Singleton' (Instance)
-// para que el Enemigo pueda encontrarlo y curarlo.
+
 using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
 using System; 
 
+[RequireComponent(typeof(PlayerMovement))]
 public class PlayerHealth : MonoBehaviour
 {
-    // --- ¡NUEVO SINGLETON! ---
     public static PlayerHealth Instance { get; private set; }
-    // --- Fin del Singleton ---
 
     [Header("Configuración de Vida (Corazones)")]
     public int numberOfHearts = 3; 
     private int maxHealth;         
     public int currentHealth;      
-    public bool isDead = false;
 
+    public bool isDead = false;
     public static event Action<int, int> OnHealthChanged; 
+
+    // --- Referencias de Componentes ---
     private SpriteRenderer spriteRenderer;
     private Animator animator;
+    private PlayerMovement playerMovement; 
 
-    // --- ¡NUEVA FUNCIÓN Awake! ---
     void Awake()
     {
-        // Configuración del Singleton
+       
         if (Instance == null)
         {
             Instance = this;
-            // Opcional: DontDestroyOnLoad(gameObject); 
-            // (No lo pongas si no quieres que el jugador pase entre escenas)
+           
         }
         else
         {
-            Destroy(gameObject); // Si ya existe un jugador, destruye este
+            Destroy(gameObject); 
         }
     }
-    // --- Fin de Awake ---
 
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
-        
-        // 1 corazón = 1 punto de vida
-        maxHealth = numberOfHearts; // Sistema 1:1
+        playerMovement = GetComponent<PlayerMovement>(); 
+
+        maxHealth = numberOfHearts; 
         currentHealth = maxHealth;
 
         StartCoroutine(InitialHealthUpdate());
@@ -85,9 +82,27 @@ public class PlayerHealth : MonoBehaviour
         {
             currentHealth = maxHealth;
         }
-        Debug.Log($"¡Jugador curado! Vida actual: {currentHealth}");
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        Debug.Log($"Jugador curado {amount}. Vida actual: {currentHealth}");
     }
+
+    // --- ¡¡NUEVA FUNCIÓN!! ---
+    /// <summary>
+    /// Llamado por EnemyHealth para aplicar el buff de velocidad.
+    /// </summary>
+    public void ApplySpeedBoost(float amount)
+    {
+        if (playerMovement != null)
+        {
+            playerMovement.IncreaseSpeed(amount);
+        }
+        else
+        {
+            Debug.LogError("¡PlayerHealth no pudo encontrar el script PlayerMovement!");
+        }
+    }
+    // --- Fin de la Nueva Función ---
+
 
     void Die()
     {
