@@ -6,29 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/MainMenu.unity
-    guid: 83e936bf2a15bb647852a3c6d6d4e296
-  - enabled: 0
-    path: Assets/Bandits - Pixel Art/Demo/Demo.unity
-    guid: 66591c3947d74f24c81e16bd1246acf2
-  - enabled: 1
-    path: Assets/Scenes/Mundo1.unity
+    path: Assets/Scenes/SampleScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
-  - enabled: 1
-    path: Assets/Scenes/Victoria.unity
-    guid: 5a60634a18f379843a93a997b3e4b4ac
-  - enabled: 1
-    path: Assets/Scenes/Derrota.unity
-    guid: 6fa32999118f7f342981be862f8f7a59
-  - enabled: 1
-    path: Assets/Scenes/Intrucciones.unity
-    guid: 0359b3d4cca5f894cb8ddd94fdca27f8
-  - enabled: 1
-    path: Assets/Scenes/MenuOpciones.unity
-    guid: d3675890f548c0446b0f2cebf6335185
-  - enabled: 1
-    path: Assets/Scenes/Creditos.unity
-    guid: e7604402832602c4bbb0c283b8c0643a
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

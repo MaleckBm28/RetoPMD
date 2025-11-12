@@ -1,17 +1,17 @@
 using UnityEngine;
 
-public class CameraFollow : MonoBehaviour
+public class CameraFollow2D : MonoBehaviour
 {
-    public Transform target; // El objetivo a seguir (el jugador)
-    public float smoothSpeed = 0.125f; // Velocidad de suavizado
-    public Vector3 offset; // Desplazamiento desde el objetivo
+    public Transform target;  // El objeto a seguir (tu personaje)
+    public float smoothSpeed = 0.125f; // Velocidad del seguimiento
+    public Vector3 offset; // Para ajustar la posición de la cámara (opcional)
 
     void LateUpdate()
     {
-        if (target == null) return; // Si no hay objetivo, no hacer nada
+        if (target == null) return; // Evita errores si no hay target
 
         Vector3 desiredPosition = target.position + offset;
         Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
-        transform.position = smoothedPosition;
+        transform.position = new Vector3(smoothedPosition.x, smoothedPosition.y, transform.position.z);
     }
 }
