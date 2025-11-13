@@ -272,7 +272,13 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Big_bloated_walk_0: 2611235946416943796
+      Big_bloated_walk_1: -274988314132968985
+      Big_bloated_walk_2: 3181458697981658110
+      Big_bloated_walk_3: -6299322133579728815
+      Big_bloated_walk_4: 8197710861447424269
+      Big_bloated_walk_5: 6604019187936291385
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -222,7 +222,11 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Centipede_death_0: 193822653049775746
+      Centipede_death_1: -7755282451000481391
+      Centipede_death_2: 3196191060424149545
+      Centipede_death_3: -1303764790419031456
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

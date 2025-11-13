@@ -222,7 +222,11 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Battle_turtle_death_0: -745335983551294080
+      Battle_turtle_death_1: 1413736703080880621
+      Battle_turtle_death_2: -2814591724678127849
+      Battle_turtle_death_3: 4803066790257568877
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

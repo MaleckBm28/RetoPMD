@@ -13,7 +13,7 @@ public class DefeatManager : MonoBehaviour
     {
         // Carga la escena del Menú Principal
         Debug.Log("iniciando juego...");
-        SceneManager.LoadScene("Mundo1");
+        SceneManager.LoadScene("Juego");
     }
     public void VolverAlMenu()
     {

@@ -272,7 +272,13 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Battle_turtle_sneer_0: -2786146590105505717
+      Battle_turtle_sneer_1: 7131838354443240939
+      Battle_turtle_sneer_2: -2636789641296443435
+      Battle_turtle_sneer_3: 1103611298618143517
+      Battle_turtle_sneer_4: 5788681992833923286
+      Battle_turtle_sneer_5: 8405842833991991284
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

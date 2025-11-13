@@ -222,7 +222,11 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Big_bloated_death_0: 3257437365176999828
+      Big_bloated_death_1: 5960078776860791587
+      Big_bloated_death_2: 3943061801776786211
+      Big_bloated_death_3: -1627690868328340577
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

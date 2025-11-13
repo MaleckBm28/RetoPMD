@@ -172,7 +172,9 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Centipede_hurt_0: -1528699848540653684
+      Centipede_hurt_1: 954088573048217125
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

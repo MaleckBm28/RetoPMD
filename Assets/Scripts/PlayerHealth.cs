@@ -1,8 +1,9 @@
-
+// ¡SCRIPT ACTUALIZADO!
+// Ya no usa PlayOneShot. Ahora "interrumpe" el audio.
 using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
-using System; 
+using System;
 
 [RequireComponent(typeof(PlayerMovement))]
 public class PlayerHealth : MonoBehaviour
@@ -10,29 +11,30 @@ public class PlayerHealth : MonoBehaviour
     public static PlayerHealth Instance { get; private set; }
 
     [Header("Configuración de Vida (Corazones)")]
-    public int numberOfHearts = 3; 
-    private int maxHealth;         
-    public int currentHealth;      
+    public int numberOfHearts = 3;
+    private int maxHealth;
+    public int currentHealth;
 
     public bool isDead = false;
-    public static event Action<int, int> OnHealthChanged; 
+    public static event Action<int, int> OnHealthChanged;
 
-    // --- Referencias de Componentes ---
     private SpriteRenderer spriteRenderer;
     private Animator animator;
-    private PlayerMovement playerMovement; 
+    private PlayerMovement playerMovement;
+
+    [Header("Audio (SFX)")]
+    public AudioSource sfxAudioSource;
+    public AudioClip hurtSound;
 
     void Awake()
     {
-       
         if (Instance == null)
         {
             Instance = this;
-           
         }
         else
         {
-            Destroy(gameObject); 
+            Destroy(gameObject);
         }
     }
 
@@ -40,9 +42,9 @@ public class PlayerHealth : MonoBehaviour
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
-        playerMovement = GetComponent<PlayerMovement>(); 
+        playerMovement = GetComponent<PlayerMovement>();
 
-        maxHealth = numberOfHearts; 
+        maxHealth = numberOfHearts;
         currentHealth = maxHealth;
 
         StartCoroutine(InitialHealthUpdate());
@@ -62,6 +64,18 @@ public class PlayerHealth : MonoBehaviour
         if (currentHealth < 0) currentHealth = 0;
 
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
+
+        // --- ¡LÓGICA DE SONIDO ACTUALIZADA! ---
+        if (sfxAudioSource != null && hurtSound != null)
+        {
+            // Detenemos CUALQUIER sonido que estuviera antes
+            sfxAudioSource.Stop();
+            // Asignamos el clip de "hurt"
+            sfxAudioSource.clip = hurtSound;
+            // Lo reproducimos
+            sfxAudioSource.Play();
+        }
+        // --- Fin de la lógica de sonido ---
 
         if (animator != null)
         {
@@ -86,10 +100,6 @@ public class PlayerHealth : MonoBehaviour
         Debug.Log($"Jugador curado {amount}. Vida actual: {currentHealth}");
     }
 
-    // --- ¡¡NUEVA FUNCIÓN!! ---
-    /// <summary>
-    /// Llamado por EnemyHealth para aplicar el buff de velocidad.
-    /// </summary>
     public void ApplySpeedBoost(float amount)
     {
         if (playerMovement != null)
@@ -101,13 +111,11 @@ public class PlayerHealth : MonoBehaviour
             Debug.LogError("¡PlayerHealth no pudo encontrar el script PlayerMovement!");
         }
     }
-    // --- Fin de la Nueva Función ---
-
 
     void Die()
     {
         isDead = true;
-        Time.timeScale = 0f; 
+        Time.timeScale = 0f;
         SceneManager.LoadScene("Derrota");
         GetComponent<Collider2D>().enabled = false;
         this.enabled = false;

@@ -222,7 +222,11 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Battle_turtle_attack3_0: 4799331749690793536
+      Battle_turtle_attack3_1: 4604560181526486866
+      Battle_turtle_attack3_2: -4284457657573066132
+      Battle_turtle_attack3_3: -597632744482848894
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

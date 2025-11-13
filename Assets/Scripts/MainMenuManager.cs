@@ -9,15 +9,11 @@ public class MainMenuManager : MonoBehaviour
 {
     // --- FUNCI�N PARA EL BOT�N "JUGAR" ---
 
-    /// <summary>
-    /// Carga la escena principal del juego.
-    /// El nombre "GameScene" debe coincidir EXACTAMENTE con el nombre de tu escena de juego.
-    /// </summary>
+ 
     public void Jugar()
     {
-        // Aseg�rate de que tu escena de juego se llama "GameScene"
 
-        string nombreDeEscena = "Demo";
+        string nombreDeEscena = "Juego";
 
         // O cambia este string por el nombre correcto.
         Debug.Log($"Cargando escena '{nombreDeEscena}'...");
@@ -26,15 +22,11 @@ public class MainMenuManager : MonoBehaviour
 
     // --- FUNCI�N PARA EL BOT�N "INSTRUCCIONES" ---
 
-    /// <summary>
-    /// Muestra las instrucciones.
-    /// (Por ahora, solo imprime un mensaje. M�s adelante, podr�a activar un panel de UI)
-    /// </summary>
-    public void MostrarInstrucciones()
+    public void MostrarOpciones()
     {
-        // TODO: Implementar un panel de instrucciones
-        Debug.Log("El bot�n 'Instrucciones' ha sido pulsado.");
-        SceneManager.LoadScene("Instrucciones");
+        // TODO: Implementar un panel de Opciones
+        Debug.Log("El bot�n 'Opciones' ha sido pulsado.");
+        SceneManager.LoadScene("MenuOpciones");
     }
 
         public void MostrarCreditos()

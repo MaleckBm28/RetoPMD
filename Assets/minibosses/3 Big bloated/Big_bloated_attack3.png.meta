@@ -297,7 +297,14 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Big_bloated_attack3_0: -4186365294900927875
+      Big_bloated_attack3_1: -4182925513783228495
+      Big_bloated_attack3_2: 4329508698840803471
+      Big_bloated_attack3_3: 7107773989263596741
+      Big_bloated_attack3_4: -4552410396194290242
+      Big_bloated_attack3_5: 3048245450866468912
+      Big_bloated_attack3_6: 5629076717939276271
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

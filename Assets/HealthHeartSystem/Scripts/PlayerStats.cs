@@ -1,6 +1,4 @@
-﻿/*
- *  Author: ariel oliveira [o.arielg@gmail.com]
- */
+﻿
 
 using UnityEngine;
 

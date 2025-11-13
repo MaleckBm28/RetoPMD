@@ -222,7 +222,11 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Centipede_attack4_0: 4370696775424898631
+      Centipede_attack4_1: -7189953870827678346
+      Centipede_attack4_2: 667725329092580217
+      Centipede_attack4_3: -2005138028776530563
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

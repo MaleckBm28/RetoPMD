@@ -172,7 +172,9 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Big_bloated_hurt_0: -7201656732633769454
+      Big_bloated_hurt_1: -7881396678482878885
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

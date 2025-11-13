@@ -222,7 +222,11 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Big_bloated_sneer_0: -3048450981199114079
+      Big_bloated_sneer_1: 4929683827969577892
+      Big_bloated_sneer_2: 6445873776808225405
+      Big_bloated_sneer_3: 1792260290927399258
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

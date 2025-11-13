@@ -222,7 +222,11 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Centipede_idle_0: 6510057486765227906
+      Centipede_idle_1: 7000556302356971276
+      Centipede_idle_2: 5204389392116608658
+      Centipede_idle_3: 8304863140311508398
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

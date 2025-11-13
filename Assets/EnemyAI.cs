@@ -1,3 +1,6 @@
+// ¡SCRIPT SIMPLIFICADO!
+// ¡Ya no hay "stoppingDistance"!
+// Mide la distancia desde el "AttackPoint", no desde el centro.
 using System.Collections;
 using UnityEngine;
 
@@ -6,17 +9,20 @@ public class EnemyAI : MonoBehaviour
     [Header("Referencias")]
     public Transform target; // El jugador
     public LayerMask playerLayer; // La capa del jugador
+    [Tooltip("El punto 'hijo' desde donde se origina el golpe (delante del enemigo)")]
+    public Transform attackPoint;
     private SpriteRenderer spriteRenderer;
     private Animator animator;
     private EnemyHealth health;
 
     [Header("Valores IA")]
     public float moveSpeed = 2f;
-    public float chaseRange = 10f; // Rango para empezar a perseguir
-    public float attackRange = 1.5f; // Rango para detenerse y atacar
-    public float attackDamage = 10f;
-    public float attackCooldown = 2f; // Tiempo entre ataques
-    public float attackHitDelay = 0.5f; // Cuándo hace daño la animación
+    public float chaseRange = 10f;
+    [Tooltip("Distancia para parar Y radio del golpe (medido desde AttackPoint)")]
+    public float attackRange = 1.5f; // ¡UNA SOLA VARIABLE DE RANGO!
+    public float attackDamage = 1f;
+    public float attackCooldown = 2f;
+    public float attackHitDelay = 0.5f;
 
     private bool isAttacking = false;
     private bool isChasing = false;
@@ -27,19 +33,23 @@ public class EnemyAI : MonoBehaviour
         animator = GetComponent<Animator>();
         health = GetComponent<EnemyHealth>();
 
-        // Busca al jugador por su Tag si no está asignado
         if (target == null)
         {
             target = GameObject.FindGameObjectWithTag("Player")?.transform;
         }
+
+        if (attackPoint == null)
+        {
+            Debug.LogWarning("¡AttackPoint no asignado en " + name + "! Usando transform.position por defecto.");
+            attackPoint = transform;
+        }
     }
 
+    // ¡¡FUNCIÓN UPDATE SIMPLIFICADA!!
     void Update()
     {
         if (health.isDead || target == null || isAttacking)
         {
-            // Si estamos muertos, no tenemos jugador o estamos atacando, no hacemos nada.
-            // PERO: Aseguramos que la animación de caminar esté apagada si no estamos persiguiendo o atacando.
             if (!isChasing || health.isDead)
             {
                 animator.SetBool("IsWalking", false);
@@ -47,31 +57,38 @@ public class EnemyAI : MonoBehaviour
             return;
         }
 
-        float distanceToPlayer = Vector2.Distance(transform.position, target.position);
+        // ¡LÓGICA SIMPLIFICADA!
+        // Medimos la distancia desde el ATTACKPOINT al jugador.
+        float distanceToPlayer = Vector2.Distance(attackPoint.position, target.position);
+        bool playerInVision = false;
 
+        // Usamos "attackRange" para decidir si paramos
         if (distanceToPlayer <= attackRange)
         {
-            // 1. En rango de ataque: Detenerse y atacar
+            // 1. En rango: ¡Parar y Atacar!
             isChasing = false;
-            animator.SetBool("IsWalking", false); // ¡Importante! Dejar de caminar
+            animator.SetBool("IsWalking", false);
             TryAttack();
+            playerInVision = true;
         }
-        else if (distanceToPlayer <= chaseRange)
+        // ¡CAMBIO! Comprobamos el rango de visión (chaseRange) desde el CENTRO
+        else if (Vector2.Distance(transform.position, target.position) <= chaseRange)
         {
-            // 2. En rango de persecución: Perseguir
+            // 2. En rango de visión: Perseguir
             isChasing = true;
             MoveTowardsPlayer();
-            animator.SetBool("IsWalking", true); // ¡Importante! Activar anim de caminar
+            animator.SetBool("IsWalking", true);
+            playerInVision = true;
         }
         else
         {
-            // 3. Fuera de rango: No hacer nada
+            // 3. Fuera de rango: Parar
             isChasing = false;
-            animator.SetBool("IsWalking", false); // ¡Importante! Dejar de caminar
+            animator.SetBool("IsWalking", false);
+            playerInVision = false;
         }
 
-        // Girar siempre hacia el jugador si está persiguiendo
-        if (isChasing)
+        if (playerInVision)
         {
             FlipTowardsPlayer();
         }
@@ -79,72 +96,81 @@ public class EnemyAI : MonoBehaviour
 
     void MoveTowardsPlayer()
     {
-        // Creamos un punto de destino que solo usa la X del jugador, pero nuestra Y
         Vector2 targetPosition = new Vector2(target.position.x, transform.position.y);
-
-        // Mueve al enemigo hacia ese punto
         transform.position = Vector2.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
     }
 
     void TryAttack()
     {
-        if (isAttacking) return; // Ya estamos atacando
-
-        StartCoroutine(PerformAttack());
+        if (isAttacking) return;
+        StartCoroutine("PerformAttack");
     }
 
     IEnumerator PerformAttack()
     {
         isAttacking = true;
 
-        // 1. Activa la animación de ataque
-        animator.SetTrigger("Attack"); // El nombre debe coincidir EXACTO con el trigger en el Animator
+        if (animator != null)
+        {
+            animator.SetTrigger("Attack");
+        }
 
-        // 2. Espera el momento justo del golpe
         yield return new WaitForSeconds(attackHitDelay);
 
-        // 3. Comprueba si el jugador está en rango para recibir el golpe
-        float distanceToPlayer = Vector2.Distance(transform.position, target.position);
-        if (distanceToPlayer <= attackRange && !health.isDead) // Re-comprobamos por si se ha movido
+        if (!isAttacking)
         {
-            // Dibuja un círculo para detectar al jugador
-            Collider2D[] hitPlayers = Physics2D.OverlapCircleAll(transform.position, attackRange, playerLayer);
-
-            foreach (Collider2D player in hitPlayers)
-            {
-                // Si detectamos a alguien, le quitamos vida
-                Debug.Log("IA golpeó a " + player.name);
-                player.GetComponent<PlayerHealth>()?.TakeDamage(Mathf.RoundToInt(attackDamage));
-            }
+            yield break;
         }
-        
-        // 4. Espera el resto del cooldown
+
+        // Usamos "attackRange" para el golpe
+        Collider2D[] hitPlayers = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, playerLayer);
+
+        foreach (Collider2D player in hitPlayers)
+        {
+            Debug.Log("IA golpeó a " + player.name + " (Ataque Frontal)");
+            player.GetComponent<PlayerHealth>()?.TakeDamage(Mathf.RoundToInt(attackDamage));
+        }
+
         yield return new WaitForSeconds(attackCooldown - attackHitDelay);
         isAttacking = false;
+    }
+
+    public void CancelAttack()
+    {
+        if (isAttacking)
+        {
+            StopCoroutine("PerformAttack");
+            isAttacking = false;
+            Debug.Log("¡Ataque del enemigo CANCELADO por daño!");
+        }
     }
 
     void FlipTowardsPlayer()
     {
         Vector2 direction = (target.position - transform.position).normalized;
-
-        // Gira el sprite
-        // Asume que el sprite original mira a la DERECHA
-        // Si tu sprite mira a la IZQUIERDA, invierte el true/false
         if (direction.x > 0)
-            spriteRenderer.flipX = true; // Mirando a la derecha
+            spriteRenderer.flipX = true;
         else if (direction.x < 0)
-            spriteRenderer.flipX = false; // Mirando a la izquierda
+            spriteRenderer.flipX = false;
     }
 
-    // --- DIBUJAR GIZMOS ---
-    // Esto dibuja los rangos en el editor para que puedas verlos
+    // ¡GIZMOS SIMPLIFICADOS!
     private void OnDrawGizmosSelected()
     {
+        // Rango de visión (Amarillo)
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, chaseRange);
 
+        // Rango de Ataque (Rojo)
+        // (Se dibuja en el AttackPoint)
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
+        if (attackPoint != null)
+        {
+            Gizmos.DrawWireSphere(attackPoint.position, attackRange);
+        }
+        else
+        {
+            Gizmos.DrawWireSphere(transform.position, attackRange);
+        }
     }
 }
-
